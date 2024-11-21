@@ -4,7 +4,7 @@ set -euo pipefail
 
 export PATH="$(pwd)/maelstrom:${PATH}"
 
-if [[ -z "$1" ]]; then
+if [[ "$#" -eq 0 ]]; then
   maelstrom serve
   exit 0
 fi
@@ -29,6 +29,13 @@ unique-ids)
     --node-count 3 \
     --availability total \
     --nemesis partition
+  ;;
+broadcast)
+  maelstrom test -w broadcast \
+    --bin ~/go/bin/maelstrom-broadcast \
+    --node-count 1 \
+    --time-limit 20 \
+    --rate 10
   ;;
 *)
   echo "Unknown command: ${command}"
