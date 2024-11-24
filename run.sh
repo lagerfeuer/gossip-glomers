@@ -33,7 +33,7 @@ unique-ids)
 broadcast)
   maelstrom test -w broadcast \
     --bin ~/go/bin/maelstrom-broadcast \
-    --node-count 1 \
+    --node-count 5 \
     --time-limit 20 \
     --rate 10
   ;;
