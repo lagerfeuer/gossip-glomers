@@ -37,6 +37,14 @@ broadcast)
     --time-limit 20 \
     --rate 10
   ;;
+counter)
+  maelstrom test -w g-counter \
+    --bin ~/go/bin/maelstrom-counter \
+    --node-count 3 \
+    --rate 100 \
+    --time-limit 20 \
+    --nemesis partition
+  ;;
 *)
   echo "Unknown command: ${command}"
   exit 1
