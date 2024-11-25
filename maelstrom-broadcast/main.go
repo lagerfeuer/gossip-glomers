@@ -7,10 +7,22 @@ import (
 	maelstrom "github.com/jepsen-io/maelstrom/demo/go"
 )
 
+var (
+	topology map[string]any
+	messages []int
+)
+
+func getConnectedNodes(n *maelstrom.Node) []string {
+	nodes := topology[n.ID()].([]any)
+	result := []string{}
+	for _, n := range nodes {
+		result = append(result, n.(string))
+	}
+	return result
+}
+
 func main() {
 	n := maelstrom.NewNode()
-	var messages []int
-	// var topology map[string]any
 
 	n.Handle("topology", func(msg maelstrom.Message) error {
 		var body map[string]any
@@ -18,13 +30,11 @@ func main() {
 			return err
 		}
 
-		// topology = body["topology"].(map[string]any)
+		topology = body["topology"].(map[string]any)
 
-		response := map[string]any{
+		return n.Reply(msg, map[string]any{
 			"type": "topology_ok",
-		}
-
-		return n.Reply(msg, response)
+		})
 	})
 
 	n.Handle("broadcast", func(msg maelstrom.Message) error {
@@ -35,8 +45,10 @@ func main() {
 
 		messages = append(messages, int(body["message"].(float64)))
 
-		nodes := n.NodeIDs()
-		for _, dest := range nodes {
+		for _, dest := range getConnectedNodes(n) {
+			if dest == msg.Src {
+				continue
+			}
 			go n.Send(dest, msg.Body)
 		}
 
